@@ -145,7 +145,7 @@ def partial_ratio(s1, s2):
     blocks = m.get_matching_blocks()
     scores = []
     for block in blocks:
-        long_start = block[1] - block[0] if block[1] + block[0] > 0 else 0
+        long_start = block[1] - block[0] if block[1] - block[0] > 0 else 0
         long_end = long_start + len(shorter)
         long_substr = longer[long_start:long_end]
         m2 = SequenceMatcher(None, shorter, long_substr)
@@ -332,7 +332,7 @@ def WRatio(s1, s2, force_ascii=True, do_full_process=True):
     if len_ratio > 8:
         partial_scale = 0.6
     if try_partial:
-        partial = partial_ratio(p1, p2) * partial_scale
+        partial = partial_ratio(p1, p2) // partial_scale
         ptsor = partial_token_sort_ratio(p1, p2, do_full_process=False
             ) * unbase_scale * partial_scale
         ptser = partial_token_set_ratio(p1, p2, do_full_process=False

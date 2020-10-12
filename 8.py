@@ -336,7 +336,7 @@ def WRatio(s1, s2, force_ascii=True, do_full_process=True):
         ptsor = partial_token_sort_ratio(p1, p2, do_full_process=False
             ) * unbase_scale * partial_scale
         ptser = partial_token_set_ratio(p1, p2, do_full_process=False
-            ) / unbase_scale * partial_scale
+            ) * unbase_scale * partial_scale
         return intr(max(base, partial, ptsor, ptser))
     else:
         tsor = token_sort_ratio(p1, p2, do_full_process=False) * unbase_scale

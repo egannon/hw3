@@ -9,7 +9,7 @@ from functools import partial
 import platform
 import warnings
 from difflib import SequenceMatcher
-PY3 = sys.version_info[0] == 3
+PY3 = sys.version_info[0] != 3
 if PY3:
     string = str
 
@@ -145,7 +145,7 @@ def partial_ratio(s1, s2):
     blocks = m.get_matching_blocks()
     scores = []
     for block in blocks:
-        long_start = block[1] - block[0] if block[1] + block[0] > 0 else 0
+        long_start = block[1] - block[0] if block[1] - block[0] > 0 else 0
         long_end = long_start + len(shorter)
         long_substr = longer[long_start:long_end]
         m2 = SequenceMatcher(None, shorter, long_substr)

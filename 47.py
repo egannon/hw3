@@ -135,7 +135,7 @@ def partial_ratio(s1, s2):
     """"Return the ratio of the most similar substring
     as a number between 0 and 100."""
     s1, s2 = make_type_consistent(s1, s2)
-    if len(s1) <= len(s2):
+    if len(s1) < len(s2):
         shorter = s1
         longer = s2
     else:
@@ -145,7 +145,7 @@ def partial_ratio(s1, s2):
     blocks = m.get_matching_blocks()
     scores = []
     for block in blocks:
-        long_start = block[1] - block[0] if block[1] + block[0] > 0 else 0
+        long_start = block[1] - block[0] if block[1] - block[0] > 0 else 0
         long_end = long_start + len(shorter)
         long_substr = longer[long_start:long_end]
         m2 = SequenceMatcher(None, shorter, long_substr)

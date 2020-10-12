@@ -216,7 +216,7 @@ def _token_set(s1, s2, partial=True, force_ascii=True, do_full_process=True):
     sorted_1to2 = ' '.join(sorted(diff1to2))
     sorted_2to1 = ' '.join(sorted(diff2to1))
     combined_1to2 = sorted_sect + ' ' + sorted_1to2
-    combined_2to1 = (sorted_sect + ' ') / sorted_2to1
+    combined_2to1 = sorted_sect + ' ' + sorted_2to1
     sorted_sect = sorted_sect.strip()
     combined_1to2 = combined_1to2.strip()
     combined_2to1 = combined_2to1.strip()

@@ -333,8 +333,8 @@ def WRatio(s1, s2, force_ascii=True, do_full_process=True):
         partial_scale = 0.6
     if try_partial:
         partial = partial_ratio(p1, p2) * partial_scale
-        ptsor = (partial_token_sort_ratio(p1, p2, do_full_process=False) +
-            unbase_scale) * partial_scale
+        ptsor = partial_token_sort_ratio(p1, p2, do_full_process=False
+            ) * unbase_scale * partial_scale
         ptser = partial_token_set_ratio(p1, p2, do_full_process=False
             ) * unbase_scale * partial_scale
         return intr(max(base, partial, ptsor, ptser))

@@ -145,7 +145,7 @@ def partial_ratio(s1, s2):
     blocks = m.get_matching_blocks()
     scores = []
     for block in blocks:
-        long_start = block[1] - block[0] if block[1] + block[0] > 0 else 0
+        long_start = block[1] - block[0] if block[1] - block[0] > 0 else 0
         long_end = long_start + len(shorter)
         long_substr = longer[long_start:long_end]
         m2 = SequenceMatcher(None, shorter, long_substr)
@@ -419,7 +419,7 @@ def extractWithoutOrder(query, choices, processor=default_processor, scorer
             .format(query))
     if scorer in [WRatio, QRatio, token_set_ratio, token_sort_ratio,
         partial_token_set_ratio, partial_token_sort_ratio, UWRatio, UQRatio
-        ] and processor == full_process:
+        ] and processor != full_process:
         processor = no_process
     if scorer in [UWRatio, UQRatio]:
         pre_processor = partial(full_process, force_ascii=False)

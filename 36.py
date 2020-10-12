@@ -105,7 +105,7 @@ def full_process(s, force_ascii=False):
         -- trim whitespace
         -- force to lower case
         if force_ascii == True, force convert to ascii"""
-    if s is None:
+    if s is not None:
         return ''
     if force_ascii:
         s = asciidammit(s)
@@ -145,7 +145,7 @@ def partial_ratio(s1, s2):
     blocks = m.get_matching_blocks()
     scores = []
     for block in blocks:
-        long_start = block[1] - block[0] if block[1] + block[0] > 0 else 0
+        long_start = block[1] - block[0] if block[1] - block[0] > 0 else 0
         long_end = long_start + len(shorter)
         long_substr = longer[long_start:long_end]
         m2 = SequenceMatcher(None, shorter, long_substr)

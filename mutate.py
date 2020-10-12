@@ -18,7 +18,6 @@ import random
 import copy
 
 
-#MAKE SEPARATE CLASSES, JUST CHANGE OPERATORS
 def main():
     # We want "randomness", but we also want it to do the same thing
     # every time (determistic execution).
@@ -35,15 +34,9 @@ def main():
     collector = AddCollector()
     
     collector.visit(program) # collects all nodes that can be possibly mutated
-
-    # all_to_visit = collector.binops_to_visit + collector.comps_to_visit
-    # print(all_to_visit)
-   # print(num_mutants)
     random.shuffle(collector.binops_to_visit) # shuffles all possibly mutated nodes
-   # print(collector.binops_to_visit)
-    #print(collector.comps_to_visit)
+    print(collector.binops_to_visit)
     to_mutate = collector.binops_to_visit[:num_mutants] # slice x amount of nodes to work on
-
     print(to_mutate)
 
     i = 0
@@ -51,8 +44,8 @@ def main():
         with open(file_to_read, 'r') as f:
             program = ast.parse(f.read())
         j = i % len(to_mutate)
-      #  print('THIS IS THE NODE I WILL MUTATE', to_mutate[j])
-        mutant = AddMutator(to_mutate[j]).visit(program) # will mutate based on the type of operator 
+        print('THIS IS THE NODE I WILL MUTATE', to_mutate[j])
+        mutant = AddMutator(to_mutate[j]).visit(program) # will mutate based on the type of operator
         newname = str(i) + ".py"
         F = open(newname, 'w')
         F.write(astor.to_source(mutant)) # convert ast to the source code and write it
@@ -69,7 +62,7 @@ class AddCollector(ast.NodeVisitor):
         self.function_count = 0
         self.binops_to_visit = []
         self.comp_count = 0
-        self.comps_to_visit = []
+        # self.comps_to_visit = []
 
     # For demonstration purposes: count how many functions there are,
     # then make sure to continue visiting the children.
@@ -88,19 +81,27 @@ class AddCollector(ast.NodeVisitor):
     
     def visit_Compare(self,node):
         self.generic_visit(node)
-        self.comp_count += 1
-        self.comps_to_visit.append(self.comp_count)
+        self.binop_count += 1
+        self.binops_to_visit.append(self.binop_count)
         # for (i, op) in enumerate(node.ops):
         #     if(isinstance(op, ast.Gt)):
         #         print(op)
         #         self.comps_to_visit.append(self.comp_count)
+    
+    # def visit_Assign(self,node):
+    #     self.generic_visit(node)
+    #     self.binop_count += 1
+    #     print('IN ASSSSSSIIGGGN', node.value)
+    #     if (isinstance(node.value, ast.AnnAssign)):
+    #         print('EVER GOING IN HERE???????')
+    #         self.binops_to_visit.append(self.binop_count)
 
 
 class AddMutator(ast.NodeTransformer):
     def __init__(self, count_of_node_to_mutate):
         self.count_of_node_to_mutate = count_of_node_to_mutate
         self.binop_count = 0
-        self.comp_count = 0
+        # self.comp_count = 0
 
     def visit_BinOp(self, node):
         self.generic_visit(node)
@@ -122,6 +123,7 @@ class AddMutator(ast.NodeTransformer):
             if isinstance(node.op,ast.Add):
                 #randomly generate a number which will associate to a certain type of transformation
                 num = random.randint(0,2)
+                print('random number', num)
                 if num == 0:
                     new_node.op = ast.Mult()
                 if num == 1: 
@@ -129,13 +131,15 @@ class AddMutator(ast.NodeTransformer):
                 if num == 2:
                     new_node.op = ast.Div()
             if isinstance(node.op, ast.Mult):
-                num = random.randint(0,2)
+                num = random.randint(0,3)
                 if num == 0:
                     new_node.op = ast.Div()
                 if num == 1: 
                     new_node.op = ast.Add()
                 if num == 2:
                     new_node.op = ast.FloorDiv()
+                if num == 3:
+                    new_node.op = ast.Sub()
             if isinstance(node.op, ast.Div):
                 num = random.randint(0,2)
                 if num == 0:
@@ -154,6 +158,7 @@ class AddMutator(ast.NodeTransformer):
                     new_node.op = ast.Div()
             if isinstance(node.op, ast.FloorDiv):
                 new_node.op = ast.Div()
+            print('I AM CREATING A NEW NODE HERE', self.binop_count)
             return new_node
         else:
             # If we're not looking at an add node we want to change, don't modify
@@ -162,40 +167,60 @@ class AddMutator(ast.NodeTransformer):
 
     def visit_Compare(self,node):
         self.generic_visit(node)
-        self.comp_count += 1
+        self.binop_count += 1
 
-        if (self.comp_count == self.count_of_node_to_mutate):
+        if (self.binop_count == self.count_of_node_to_mutate):
             new_node = copy.deepcopy(node)
             print('IN COMPARE')
+            print('THIS IS THE PREVIOUS OP', node.ops)
             for (i, op) in enumerate(node.ops):
                 if(isinstance(op, ast.Gt)):
-                    new_node.ops[i] = ast.GtE()
-                    return new_node
+                    num = random.randint(0,2)
+                    if num == 0:
+                        new_node.ops[i] = ast.GtE()
+                    if num == 1:
+                        new_node.ops[i] = ast.LtE()
+                    if num == 2:
+                        new_node.ops[i] = ast.Lt()
+                if(isinstance(op, ast.GtE)):
+                    num = random.randint(0,2)
+                    if num == 0:
+                        new_node.ops[i] = ast.Gt()
+                    if num == 1:
+                         new_node.ops[i] = ast.Lt()
+                    if num == 2:
+                         new_node.ops[i] = ast.LtE()
                 if(isinstance(op, ast.Lt)):
-                    new_node.ops[i] = ast.LtE()
-                    return new_node
-                if(isinstance(op, ast.Gt)):
-                    new_node.ops[i] = ast.LtE()
-                    return new_node
-                if(isinstance(op, ast.Lt)):
-                    new_node.ops[i] = ast.GtE()
-                    return new_node
-                if(isinstance(op, ast.Gt)):
-                    new_node.ops[i] = ast.GtE()
-                    return new_node
+                    num = random.randint(0,2)
+                    if num == 0:
+                        new_node.ops[i] = ast.LtE()
+                    if num == 1:
+                        new_node.ops[i] = ast.GtE()
+                    if num == 2:
+                        new_node.ops[i] = ast.Gt()
+                if(isinstance(op, ast.LtE)):
+                    num = random.randint(0,2)
+                    if num == 0:
+                        new_node.ops[i] = ast.Lt()
+                    if num == 1:
+                        new_node.ops[i] = ast.GtE()
+                    if num == 2:
+                        new_node.ops[i] = ast.Gt()
                 if(isinstance(op, ast.Eq)):
                     new_node.ops[i] = ast.NotEq()
-                    return new_node
+                if(isinstance(op, ast.NotEq)):
+                    new_node.ops[i] = ast.Eq()
                 if(isinstance(op, ast.Is)):
                     new_node.ops[i] = ast.IsNot()
-                    return new_node
+                if(isinstance(op, ast.IsNot)):
+                    new_node.ops[i] = ast.Is()
+                print('THIS IS THE NEW OP', new_node.ops)
+                print('I AM CREATING A NEW NODE HERE', self.binop_count)
+                return new_node
         return node
 
 if __name__ == '__main__':
     main()
-
-
-
 
 #  if isinstance(node.op, ast.Eq): # CHANGE       
 #                 new_node = ast.Compare(new_node.left, ast.NotEq(), new_node.right)

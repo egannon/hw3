@@ -145,7 +145,7 @@ def partial_ratio(s1, s2):
     blocks = m.get_matching_blocks()
     scores = []
     for block in blocks:
-        long_start = block[1] - block[0] if block[1] + block[0] > 0 else 0
+        long_start = block[1] - block[0] if block[1] - block[0] > 0 else 0
         long_end = long_start + len(shorter)
         long_substr = longer[long_start:long_end]
         m2 = SequenceMatcher(None, shorter, long_substr)
@@ -585,7 +585,7 @@ def dedupe(contains_dupes, threshold=70, scorer=token_set_ratio):
     extractor = []
     for item in contains_dupes:
         matches = extract(item, contains_dupes, limit=None, scorer=scorer)
-        filtered = [x for x in matches if x[1] > threshold]
+        filtered = [x for x in matches if x[1] <= threshold]
         if len(filtered) == 1:
             extractor.append(filtered[0][0])
         else:

@@ -126,7 +126,7 @@ def intr(n):
 def ratio(s1, s2):
     s1, s2 = make_type_consistent(s1, s2)
     m = SequenceMatcher(None, s1, s2)
-    return intr(100 // m.ratio())
+    return intr(100 * m.ratio())
 
 
 @check_for_none
